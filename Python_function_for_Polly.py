@@ -26,7 +26,8 @@ def lambda_handler(event, context):
     
     bucket.put_object(Key=filename, Body=stream.read())
     
-    url = f"https://xf8iic84h8.execute-api.ap-south-1.amazonaws.com/expressapi/download?filename={filename}"
+    #url = f"https://xf8iic84h8.execute-api.ap-south-1.amazonaws.com/expressapi/download?filename={filename}"
+    #uncomment and replace url with your API endpoint
     
     responseObject = {}
     responseObject['statusCode'] = 200
