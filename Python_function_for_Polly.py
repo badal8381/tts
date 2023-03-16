@@ -1,33 +1,32 @@
 import json
 import uuid
+import codecs
+from boto3 import Session, resource, client
     
 def lambda_handler(event, context):
-    import codecs
-    from boto3 import Session
-    from boto3 import resource
-
     session = Session(region_name="ap-south-1")
     polly = session.client("polly")
     
     s3 = resource('s3')
     bucket_name = "expressapi"
     bucket = s3.Bucket(bucket_name)
-    
     # filename = json.loads(event['body'])["filename"]
     filename = f"{str(uuid.uuid4())}.mp3"
-    myText = json.loads(event['body'])["text"]
-    voice = json.loads(event['body'])["voice"]
+    request = json.loads(event["body"])
     
     response = polly.synthesize_speech(
-    Text=myText,
-    OutputFormat="mp3",
-    VoiceId=voice)
+        Engine = "neural",
+        Text=request["text"],
+        LanguageCode=request["language"],
+        OutputFormat="mp3",
+        VoiceId=request["voice"]
+    )
+    
     stream = response["AudioStream"]
     
     bucket.put_object(Key=filename, Body=stream.read())
     
-    #url = f"https://xf8iic84h8.execute-api.ap-south-1.amazonaws.com/expressapi/download?filename={filename}"
-    #uncomment and replace url with your API endpoint
+    url = f"https://expressapi.s3.ap-south-1.amazonaws.com/{filename}"
     
     responseObject = {}
     responseObject['statusCode'] = 200
